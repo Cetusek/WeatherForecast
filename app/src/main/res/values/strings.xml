@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">WeatherForecast</string>
+    <string name="no_permissions">No needed permissions. Application will stop.</string>
+    <string name="place_name">Place name</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="added_to_favourites">Added to favourites</string>
+    <string name="saved">Saved</string>
+
+</resources>
