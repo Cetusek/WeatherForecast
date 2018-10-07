@@ -26,6 +26,10 @@ public class DBAsyncTask extends AsyncTask{
         execute(DBAsyncTaskType.REPLACE_PLACES, places);
     }
 
+    public void countPlaces() {
+        execute(DBAsyncTaskType.COUNT_PLACES, null);
+    }
+
     private Long _insertPlaceEntity(PlaceEntity placeEntity) {
         AppDatabase db = AppDatabase.getInstance();
         return db.AppDao().insertPlace(placeEntity);
@@ -42,6 +46,11 @@ public class DBAsyncTask extends AsyncTask{
         return db.AppDao().insertPlaces(places);
     }
 
+    private int _countPlaces() {
+        AppDatabase db = AppDatabase.getInstance();
+        return db.AppDao().countPlaces();
+    }
+
 
     @Override
     protected Object doInBackground(Object[] params) {
@@ -56,6 +65,8 @@ public class DBAsyncTask extends AsyncTask{
             case REPLACE_PLACES:
                 result = _replacePlaces((PlaceEntity[]) params[1]);
                 break;
+            case COUNT_PLACES:
+                result = _countPlaces();
         }
         return result;
     }
@@ -71,7 +82,8 @@ public class DBAsyncTask extends AsyncTask{
     private enum DBAsyncTaskType {
         INSERT_PLACE,
         SELECT_PLACES,
-        REPLACE_PLACES
+        REPLACE_PLACES,
+        COUNT_PLACES
     }
 
     public interface Callback {

@@ -21,5 +21,8 @@ public interface AppDao {
     @Query("DELETE FROM PLACES")
     public void deletePlaces();
 
+    @Query("SELECT COUNT(*) FROM PLACES")
+    public int countPlaces();
+
 
 }

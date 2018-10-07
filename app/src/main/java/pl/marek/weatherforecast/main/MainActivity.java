@@ -16,12 +16,13 @@ import pl.marek.weatherforecast.favourites.FavouritesActivity;
 import pl.marek.weatherforecast.map.MapActivity;
 import pl.marek.weatherforecast.permission.PermissionTools;
 import pl.marek.weatherforecast.persistence.AppDatabase;
+import pl.marek.weatherforecast.persistence.DBAsyncTask;
 import pl.marek.weatherforecast.presenter.PresenterAction;
 import pl.marek.weatherforecast.presenter.PresenterActivity;
 import pl.marek.weatherforecast.presenter.PresenterParameters;
 import pl.marek.weatherforecast.storm.StormActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DBAsyncTask.Callback{
 
     ImageButton buttonMap;
     ImageButton buttonFavourites;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         mapGUI();
         checkPermissions();
         initDBInstance();
+        checkFavourites();
     }
 
     private void mapGUI() {
@@ -123,4 +125,22 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
     }
 
+
+    private void checkFavourites() {
+        DBAsyncTask task = new DBAsyncTask("CHECK_FAVOURITES", this);
+        task.countPlaces();
+    }
+
+    @Override
+    public void DBAsyncTaskFinished(String callerId, Object result) {
+        Log.i("MY_APP", "DBAsyncTaskFinished = "+result.toString());
+        if ((Integer)result > 0) {
+            buttonPresenterPressed();
+        }
+    }
+
+    @Override
+    public void DBAsyncTaskError(String callerId, String message) {
+
+    }
 }
