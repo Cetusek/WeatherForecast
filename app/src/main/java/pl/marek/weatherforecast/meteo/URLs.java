@@ -17,8 +17,8 @@ public class URLs {
 
     public static String getImageURL(Coordinates coordinates) {
         String result = URL_IMAGE;
-        result = result.replace("$$ROW$$", Integer.toString(coordinates.row));
-        result = result.replace("$$COL$$", Integer.toString(coordinates.col));
+        result = result.replace("$$ROW$$", Integer.toString(coordinates.getRow()));
+        result = result.replace("$$COL$$", Integer.toString(coordinates.getCol()));
         return result;
     }
 

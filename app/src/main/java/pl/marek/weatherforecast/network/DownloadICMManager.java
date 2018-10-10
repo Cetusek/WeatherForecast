@@ -14,20 +14,17 @@ import pl.marek.weatherforecast.meteo.Coordinates;
 import pl.marek.weatherforecast.meteo.URLs;
 import pl.marek.weatherforecast.presenter.PresenterAdapter;
 
-public class DownloadManager implements DownloadCoordinates.DownloadCoordinatesCallback, DownloadImage.DownloadImageCallback{
+public class DownloadICMManager implements DownloadCoordinates.DownloadCoordinatesCallback, DownloadImage.DownloadImageCallback{
 
     private PresenterAdapter presenterAdapter;
-    int position;
-    Bitmap bitmap;
+    private int position;
+    private Bitmap bitmap;
+    private Coordinates coordinates;
 
-    public void downloadImage(LatLng location, PresenterAdapter presenterAdapter, int position) {
+
+    public void downloadICMImage(LatLng location, PresenterAdapter presenterAdapter, int position) {
         this.presenterAdapter = presenterAdapter;
         this.position = position;
-        executeTask(location);
-    }
-
-    public void downloadImage(LatLng location, Bitmap bitmap) {
-        this.bitmap = bitmap;
         executeTask(location);
     }
 
@@ -40,6 +37,11 @@ public class DownloadManager implements DownloadCoordinates.DownloadCoordinatesC
 
     @Override
     public void onCoordinatesWereDownloaded(Coordinates coordinates) {
+        this.coordinates = coordinates;
+        downloadICMImage();
+    }
+
+    private void downloadICMImage() {
         DownloadImage task = null;
         try {
             task = new DownloadImage(new URL(URLs.getImageURL(coordinates)), this);
@@ -56,8 +58,16 @@ public class DownloadManager implements DownloadCoordinates.DownloadCoordinatesC
 
     @Override
     public void onImageIsDownloaded(Bitmap bitmap) {
+        if (bitmap.getHeight() < 100) {
+            //To znaczy, że ICM jeszcze nie wygenerował obrazka, więc trzbea spróbować w sąsiednim miejscu
+            if (coordinates.getAttemptNo() < coordinates.getMaxAttempt()) {
+                coordinates.increaseAttempt();
+                downloadICMImage();
+                return;
+            }
+        }
         if (presenterAdapter != null) {
-            presenterAdapter.onImageLoaded(bitmap, position);
+            presenterAdapter.onImageLoaded(bitmap, position, Integer.toString(coordinates.getAttemptNo()));
         }
         this.bitmap = bitmap;
     }

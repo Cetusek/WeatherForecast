@@ -16,22 +16,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
-        <Button
+        <ImageButton
             android:id="@+id/MapActivityButtonAddToFavourites"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="10pt"
             android:layout_weight="1"
-            android:text="Add to favourites" />
+            android:background="@null"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/add_to_favorites_icon" />
 
-        <Button
+        <ImageButton
             android:id="@+id/MapActivityButtonShowForecast"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
+            android:layout_margin="10pt"
             android:layout_weight="1"
-            android:text="Show forecast" />
+            android:background="@null"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/presenter_icon" />
+
     </LinearLayout>
 
 </LinearLayout>

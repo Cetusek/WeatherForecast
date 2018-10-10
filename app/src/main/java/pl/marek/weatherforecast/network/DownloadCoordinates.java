@@ -39,8 +39,8 @@ public class DownloadCoordinates extends AsyncTask {
             String line = reader.readLine();
             reader.close();
             JSONObject json = new JSONObject(line);
-            result.row = json.getInt("row");
-            result.col = json.getInt("col");
+            result.setRow(json.getInt("row"));
+            result.setCol(json.getInt("col"));
         } catch (MalformedURLException e) {
             callback.onCoordinatesDownloadErrorOccurred("onCoordinatesDownloadErrorOccurred MalformedURLException "+e.getMessage());
         } catch (IOException e) {

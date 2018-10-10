@@ -5,9 +5,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,8 +22,6 @@ import java.util.List;
 import java.util.Locale;
 
 import pl.marek.weatherforecast.R;
-import pl.marek.weatherforecast.network.DownloadCoordinates;
-import pl.marek.weatherforecast.network.DownloadManager;
 import pl.marek.weatherforecast.persistence.DBAsyncTask;
 import pl.marek.weatherforecast.persistence.PlaceEntity;
 import pl.marek.weatherforecast.presenter.PresenterAction;
@@ -39,8 +36,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap gmap;
     private MarkerOptions markerOption;
     private Marker marker;
-    private Button buttonAddToFavourites;
-    private Button buttonShowPresenter;
+    private ImageButton buttonAddToFavourites;
+    private ImageButton buttonShowPresenter;
 
 
     @Override
@@ -55,14 +52,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void mapGUI() {
 
         mapView = (MapView) findViewById(R.id.MapActivityMapView);
-        buttonAddToFavourites = (Button) findViewById(R.id.MapActivityButtonAddToFavourites);
+        buttonAddToFavourites = (ImageButton) findViewById(R.id.MapActivityButtonAddToFavourites);
         buttonAddToFavourites.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 buttonAddToFavouritesPressed();
             }
         });
-        buttonShowPresenter = (Button) findViewById(R.id.MapActivityButtonShowForecast);
+        buttonShowPresenter = (ImageButton) findViewById(R.id.MapActivityButtonShowForecast);
         buttonShowPresenter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +70,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private String getLocationName(LatLng location) {
-        String result = "?";
+        String result = "";
         Geocoder geo = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> addressList = geo.getFromLocation(location.latitude, location.longitude, 1);

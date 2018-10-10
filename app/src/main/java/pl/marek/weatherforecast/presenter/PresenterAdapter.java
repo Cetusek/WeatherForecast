@@ -50,6 +50,7 @@ public class PresenterAdapter extends PagerAdapter {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.presenter_page, container, false);
         layout.setTag(getTagForPosition(position));
+        deployLogText(layout, "");
         TextView pageName = (TextView) layout.findViewById(R.id.PresenterPageName);
         pageName.setText(presenterListItem.name);
         if (presenterListItem.bitmap != null) {
@@ -63,6 +64,11 @@ public class PresenterAdapter extends PagerAdapter {
         ImageView imageView = (ImageView) layout.findViewById(R.id.PresenterPageImageView);
         imageView.setVisibility(View.VISIBLE);
         imageView.setImageBitmap(bitmap);
+    }
+
+    private void deployLogText(ViewGroup layout, String logText) {
+        TextView textView = (TextView) layout.findViewById(R.id.PresenterPageLog);
+        textView.setText(logText);
     }
 
     private String getTagForPosition(int position) {
@@ -82,10 +88,12 @@ public class PresenterAdapter extends PagerAdapter {
         return view == object;
     }
 
-    public void onImageLoaded(Bitmap bitmap, int position) {
+    public void onImageLoaded(Bitmap bitmap, int position, String logText) {
         PresenterListItem item = getPresenterListItem(position);
         item.bitmap = bitmap;
-        deployImage((ViewGroup) container.findViewWithTag(getTagForPosition(position)), item.bitmap);
+        ViewGroup viewGroup = (ViewGroup) container.findViewWithTag(getTagForPosition(position));
+        deployImage(viewGroup, item.bitmap);
+        deployLogText(viewGroup, logText);
     }
 
 }
