@@ -90,9 +90,11 @@ public class PresenterAdapter extends PagerAdapter {
 
     public void onImageLoaded(Bitmap bitmap, int position, String logText) {
         PresenterListItem item = getPresenterListItem(position);
-        item.bitmap = bitmap;
         ViewGroup viewGroup = (ViewGroup) container.findViewWithTag(getTagForPosition(position));
-        deployImage(viewGroup, item.bitmap);
+        item.bitmap = bitmap;
+        if (bitmap != null) {
+            deployImage(viewGroup, item.bitmap);
+        }
         deployLogText(viewGroup, logText);
     }
 

@@ -1,15 +1,18 @@
 package pl.marek.weatherforecast.network;
 
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import pl.marek.weatherforecast.R;
 import pl.marek.weatherforecast.meteo.Coordinates;
 import pl.marek.weatherforecast.meteo.URLs;
 import pl.marek.weatherforecast.presenter.PresenterAdapter;
@@ -20,7 +23,11 @@ public class DownloadICMManager implements DownloadCoordinates.DownloadCoordinat
     private int position;
     private Bitmap bitmap;
     private Coordinates coordinates;
+    private Context context;
 
+    public DownloadICMManager(Context context) {
+        this.context = context;
+    }
 
     public void downloadICMImage(LatLng location, PresenterAdapter presenterAdapter, int position) {
         this.presenterAdapter = presenterAdapter;
@@ -38,7 +45,12 @@ public class DownloadICMManager implements DownloadCoordinates.DownloadCoordinat
     @Override
     public void onCoordinatesWereDownloaded(Coordinates coordinates) {
         this.coordinates = coordinates;
-        downloadICMImage();
+        if (coordinates != null) {
+            downloadICMImage();
+        }
+        else {
+            onImageDownloadErrorOccurred(context.getResources().getString(R.string.internet_problem));
+        }
     }
 
     private void downloadICMImage() {
@@ -53,12 +65,11 @@ public class DownloadICMManager implements DownloadCoordinates.DownloadCoordinat
 
     @Override
     public void onCoordinatesDownloadErrorOccurred(String message) {
-        Log.i("MY_APP", "Error: "+message);
     }
 
     @Override
     public void onImageIsDownloaded(Bitmap bitmap) {
-        if (bitmap.getHeight() < 100) {
+        if (bitmap != null && bitmap.getHeight() < 100) {
             //To znaczy, że ICM jeszcze nie wygenerował obrazka, więc trzbea spróbować w sąsiednim miejscu
             if (coordinates.getAttemptNo() < coordinates.getMaxAttempt()) {
                 coordinates.increaseAttempt();
@@ -74,6 +85,8 @@ public class DownloadICMManager implements DownloadCoordinates.DownloadCoordinat
 
     @Override
     public void onImageDownloadErrorOccurred(String message) {
-        Log.i("MY_APP", "Error: "+message);
+        if (presenterAdapter != null) {
+            presenterAdapter.onImageLoaded(null, position, message);
+        }
     }
 }

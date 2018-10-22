@@ -31,7 +31,7 @@ public class DownloadCoordinates extends AsyncTask {
     @Override
     protected Coordinates doInBackground(Object[] params) {
 
-        Coordinates result = new Coordinates();
+        Coordinates result = null;
 
         try {
             URL url = new URL(URLs.getCoordinatesURL(location));
@@ -39,6 +39,7 @@ public class DownloadCoordinates extends AsyncTask {
             String line = reader.readLine();
             reader.close();
             JSONObject json = new JSONObject(line);
+            result = new Coordinates();
             result.setRow(json.getInt("row"));
             result.setCol(json.getInt("col"));
         } catch (MalformedURLException e) {

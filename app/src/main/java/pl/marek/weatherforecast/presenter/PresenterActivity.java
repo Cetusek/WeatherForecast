@@ -3,8 +3,12 @@ package pl.marek.weatherforecast.presenter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import pl.marek.weatherforecast.R;
+import pl.marek.weatherforecast.network.DownloadGIOSManager;
 import pl.marek.weatherforecast.network.DownloadICMManager;
 import pl.marek.weatherforecast.persistence.DBAsyncTask;
 import pl.marek.weatherforecast.persistence.PlaceEntity;
@@ -14,6 +18,7 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
     ViewPager viewPager;
     PresenterAdapter presenterAdapter;
     PresenterParameters presenterParameters;
+    Button airDataButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,11 +96,23 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
 
             }
         });
+        airDataButton = (Button) findViewById(R.id.PresenterActivityAirDataButton);
+        airDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                airDataButtonPressed();
+            }
+        });
 
     }
 
+    private void airDataButtonPressed() {
+        DownloadGIOSManager downloadGIOSManager = new DownloadGIOSManager();
+        downloadGIOSManager.downloadSensors(295);
+    }
+
     private void loadImage(int position) {
-        DownloadICMManager m = new DownloadICMManager();
+        DownloadICMManager m = new DownloadICMManager(getApplicationContext());
         m.downloadICMImage(presenterAdapter.getPresenterListItem(position).getLatLng(), presenterAdapter, position);
     }
 

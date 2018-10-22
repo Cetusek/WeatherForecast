@@ -4,13 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1"
     tools:context="pl.marek.weatherforecast.presenter.PresenterActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/PresenterActivityViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
     </android.support.v4.view.ViewPager>
+
+    <Button
+        android:id="@+id/PresenterActivityAirDataButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button" />
 
 </LinearLayout>
