@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import pl.marek.weatherforecast.R;
+import pl.marek.weatherforecast.gios.GIOSStation;
 import pl.marek.weatherforecast.persistence.PlaceEntity;
 
 public class PresenterListItem {
@@ -14,6 +15,7 @@ public class PresenterListItem {
     public double latitude;
     public double longitude;
     public Bitmap bitmap;
+    public GIOSStation GIOSStation;
 
 
     public PresenterListItem() {
@@ -24,6 +26,7 @@ public class PresenterListItem {
         name = place.name;
         latitude = place.latitude;
         longitude = place.longitude;
+        GIOSStation = null;
     }
 
     public LatLng getLatLng() {

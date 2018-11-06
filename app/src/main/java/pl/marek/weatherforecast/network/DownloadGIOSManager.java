@@ -2,6 +2,7 @@ package pl.marek.weatherforecast.network;
 
 
 import android.util.Log;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +24,19 @@ public class DownloadGIOSManager implements DownloadGIOSData.DownloadGIOSDataCal
     private final String URL_AIR_QUALITY_INDEX = "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/$stationId$";
 
     private DownloadGIOSManagerCallback callback;
+    private TaskType taskType;
 
-    public DownloadGIOSManager() {
+    private int position;
+
+    private GIOSSensor sensor;
+
+    private double latitude;
+    private double longitude;
+
+
+    public DownloadGIOSManager(DownloadGIOSManagerCallback callback) {
+        this.callback = callback;
+        taskType = TaskType.NONE;
     }
 
     public void downloadStations() {
@@ -33,53 +45,105 @@ public class DownloadGIOSManager implements DownloadGIOSData.DownloadGIOSDataCal
     }
 
     public void downloadSensors(int stationId) {
+        taskType = TaskType.SENSORS;
         DownloadGIOSData task = new DownloadGIOSData(this, URL_SENSORS.replace("$stationId$", Integer.toString(stationId)), DownloadGIOSData.DownloadDataKind.SENSORS);
         task.execute();
     }
 
-    public void downloadAirQualityIndex(int stationId) {
-        DownloadGIOSData task = new DownloadGIOSData(this, URL_AIR_QUALITY_INDEX.replace("$stationId$", Integer.toString(stationId)), DownloadGIOSData.DownloadDataKind.AIR_QUALITY_INDEX);
-        task.execute();
-    }
-    public void downloadSensorData(int sensorId) {
-        DownloadGIOSData task = new DownloadGIOSData(this, URL_SENSOR_DATA.replace("$sensorId$", Integer.toString(sensorId)), DownloadGIOSData.DownloadDataKind.SENSOR_DATA);
+    public void downloadSensorData(GIOSSensor sensor) {
+        taskType = TaskType.SENSOR_DATA;
+        this.sensor = sensor;
+        DownloadGIOSData task = new DownloadGIOSData(this, URL_SENSOR_DATA.replace("$sensorId$", Integer.toString(sensor.id)), DownloadGIOSData.DownloadDataKind.SENSOR_DATA);
         task.execute();
     }
 
-    private void encodeStations(JSONArray json) {
+    public void downloadAirQualityIndexForStation(int position, GIOSStation GIOSStation) {
+        taskType = TaskType.AIR_QUALITY_INDEX_FOR_STATION;
+        this.position = position;
+        DownloadGIOSData task = new DownloadGIOSData(this, URL_AIR_QUALITY_INDEX.replace("$stationId$", Integer.toString(GIOSStation.id)), DownloadGIOSData.DownloadDataKind.AIR_QUALITY_INDEX);
+        task.execute();
+    }
+
+    public void downloadClosestStation(int position, double latitude, double longitude) {
+        taskType = TaskType.CLOSEST_STATION;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.position = position;
+        downloadStations();
+    }
+
+    private void onStationsDownloaded(Object result) {
+        GIOSStationList list = encodeStations((JSONArray) result);
+        switch (taskType) {
+            case NONE:
+                break;
+            case CLOSEST_STATION:
+                GIOSStation closestStation = list.getClosestStation(latitude, longitude);
+                if (callback != null) {
+                    callback.GIOSClosestStationDownloaded(position, closestStation);
+                }
+                break;
+        }
+    }
+
+    private void onAirQualityIndexDownloaded(Object result) {
+        GIOSAirQualityIndex airQualityIndex = encodeAirQualityIndex((JSONObject) result);
+        switch (taskType) {
+            case NONE:
+                break;
+            case AIR_QUALITY_INDEX_FOR_STATION:
+                if (callback != null) {
+                    callback.GIOSAirQualityIndexDownloaded(position, airQualityIndex);
+                }
+                break;
+        }
+    }
+
+    private void onSensorsDownloaded(Object result) {
+        ArrayList<GIOSSensor> list = encodeSensors((JSONArray) result);
+        if (callback != null) {
+            callback.GIOSSensorsDownloaded(list);
+        }
+    }
+
+    private GIOSStationList encodeStations(JSONArray json) {
         GIOSStationList list = new GIOSStationList();
         if (json != null) {
             for (int i = 0; i < json.length(); i++) {
                 try {
                     list.add(new GIOSStation(json.getJSONObject(i)));
                 } catch (JSONException e) {
-                    return;
+                    return list;
                 }
             }
         }
-        GIOSStation closestStation = list.getClosestStation(51.739105, 19.564188);
-        if (closestStation != null) {
-            Log.i("MY_APP", closestStation.toString());
-        }
+        return list;
     }
 
-    private void encodeSensors(JSONArray json) {
+
+    private ArrayList<GIOSSensor> encodeSensors(JSONArray json) {
         ArrayList<GIOSSensor> list = new ArrayList<>();
         if (json != null) {
             for (int i = 0; i < json.length(); i++) {
                 try {
                     list.add(new GIOSSensor(json.getJSONObject(i)));
                 } catch (JSONException e) {
-                    return;
+                    return list;
                 }
             }
         }
-        for (GIOSSensor sensor :  list) {
-            Log.i("MY_APP", sensor.toString());
-        }
+        return list;
     }
 
-    private void encodeSensorData(JSONObject json) {
+    private void onSensorDataDownload(Object result) {
+        sensor.values  = encodeSensorData((JSONObject) result);
+        if (callback != null) {
+            callback.GIOSSensorDataDownloaded(sensor);
+        }
+
+    }
+
+    private ArrayList<GIOSSensorValue> encodeSensorData(JSONObject json) {
         ArrayList<GIOSSensorValue> list = new ArrayList<>();
         if (json != null) {
             try {
@@ -88,35 +152,34 @@ public class DownloadGIOSManager implements DownloadGIOSData.DownloadGIOSDataCal
                         list.add(new GIOSSensorValue(values.getJSONObject(i)));
             }
             } catch (JSONException e) {
-                return;
+                return list;
             }
         }
-        for (GIOSSensorValue value :  list) {
-            Log.i("MY_APP", value.toString());
-        }
+        return list;
     }
 
-    private void encodeAirQuallityIndex(JSONObject json) {
+    private GIOSAirQualityIndex encodeAirQualityIndex(JSONObject json) {
+        GIOSAirQualityIndex airQualityIndex = null;
         if (json != null) {
-            GIOSAirQualityIndex airQualityIndex = new GIOSAirQualityIndex(json);
-            Log.i("MY_APP", airQualityIndex.toString());
+            airQualityIndex = new GIOSAirQualityIndex(json);
         }
+        return airQualityIndex;
     }
 
     @Override
     public void onDownloadGIOSSuccess(DownloadGIOSData.DownloadDataKind downloadDataKind, Object result) {
         switch (downloadDataKind) {
             case STATIONS:
-                encodeStations((JSONArray) result);
+                onStationsDownloaded(result);
                 break;
             case SENSORS:
-                encodeSensors((JSONArray) result);
+                onSensorsDownloaded(result);
                 break;
             case SENSOR_DATA:
-                encodeSensorData((JSONObject) result);
+                onSensorDataDownload(result);
                 break;
             case AIR_QUALITY_INDEX:
-                encodeAirQuallityIndex((JSONObject) result);
+                onAirQualityIndexDownloaded(result);
                 break;
         }
     }
@@ -127,8 +190,19 @@ public class DownloadGIOSManager implements DownloadGIOSData.DownloadGIOSDataCal
     }
 
     public interface DownloadGIOSManagerCallback {
-        void GIOSStationListDownloaded(ArrayList<GIOSStation> list);
-        void GIOSErrorOccured(String message);
+        void GIOSAirQualityIndexDownloaded(int position, GIOSAirQualityIndex airQualityIndex);
+        void GIOSClosestStationDownloaded(int position, GIOSStation GIOSStation);
+        void GIOSSensorsDownloaded(ArrayList<GIOSSensor> list);
+        void GIOSSensorDataDownloaded(GIOSSensor sensor);
+        void GIOSErrorOccurred(String message);
+    }
+
+    private enum TaskType {
+        NONE,
+        CLOSEST_STATION,
+        AIR_QUALITY_INDEX_FOR_STATION,
+        SENSORS,
+        SENSOR_DATA
     }
 
 }

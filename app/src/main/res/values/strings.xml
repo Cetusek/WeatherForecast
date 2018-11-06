@@ -7,5 +7,7 @@
     <string name="added_to_favourites">Added to favourites</string>
     <string name="saved">Saved</string>
     <string name="internet_problem">Internet problem</string>
+    <string name="air_quality_index_downloading">Air Quality Index downloading ...</string>
+    <string name="air_quality_index">Air Quality Index:</string>
 
 </resources>

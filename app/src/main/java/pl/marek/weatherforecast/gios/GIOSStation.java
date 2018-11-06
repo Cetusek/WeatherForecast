@@ -4,7 +4,9 @@ package pl.marek.weatherforecast.gios;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GIOSStation {
+import java.io.Serializable;
+
+public class GIOSStation implements Serializable{
 
     public int id;
     public String stationName;

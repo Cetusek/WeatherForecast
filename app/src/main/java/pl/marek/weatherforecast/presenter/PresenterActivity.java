@@ -60,7 +60,7 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
             presenterAdapter.addItem(new PresenterListItem(places[i]));
         }
         if (places.length > 0) {
-            loadImageForFirstItem();
+            loadPageContentForFirstItem();
         }
         viewPager.setAdapter(presenterAdapter);
     }
@@ -71,11 +71,16 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
         item.latitude = presenterParameters.latitude;
         item.longitude = presenterParameters.longitude;
         presenterAdapter.addItem(item);
-        loadImageForFirstItem();
+        loadPageContentForFirstItem();
     }
 
-    private void loadImageForFirstItem() {
-        loadImage(0);
+    private void loadPageContentForPosition(int position) {
+        loadImage(position);
+        loadAirQualityIndex(position);
+    }
+
+    private void loadPageContentForFirstItem() {
+        loadPageContentForPosition(0);
     }
 
     private void mapGUI() {
@@ -107,8 +112,8 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
     }
 
     private void airDataButtonPressed() {
-        DownloadGIOSManager downloadGIOSManager = new DownloadGIOSManager();
-        downloadGIOSManager.downloadStations();
+        //DownloadGIOSManager downloadGIOSManager = new DownloadGIOSManager();
+        //downloadGIOSManager.downloadStations();
         //downloadGIOSManager.downloadSensors(295);
         //downloadGIOSManager.downloadSensorData(2060);
         //downloadGIOSManager.downloadAirQualityIndex(295);
@@ -119,8 +124,12 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
         m.downloadICMImage(presenterAdapter.getPresenterListItem(position).getLatLng(), presenterAdapter, position);
     }
 
+    private void loadAirQualityIndex(int position) {
+        presenterAdapter.loadAirQualityIndex(position);
+    }
+
     private void onViewerPageSelected(int position) {
-        loadImage(position);
+        loadPageContentForPosition(position);
     }
 
     @Override

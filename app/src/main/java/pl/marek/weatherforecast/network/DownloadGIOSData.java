@@ -11,9 +11,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import pl.marek.weatherforecast.gios.GIOSStation;
 import pl.marek.weatherforecast.meteo.Coordinates;
@@ -40,12 +42,16 @@ public class DownloadGIOSData extends AsyncTask {
             BufferedReader reader = new BufferedReader(new InputStreamReader(url_.openStream()));
             StringBuilder sb = new StringBuilder();
             String line;
-            while ((line = reader.readLine()) != null)  {
-                sb.append(line);
+            Log.i("MY_APP", "before readLine");
+            char[] buffer = new char[1024];
+            int charsRead;
+            while ((charsRead = reader.read(buffer)) != -1)  {
+                Log.i("MY_APP", "charsRead = "+charsRead);
+                sb.append(Arrays.copyOf(buffer, charsRead));
+                Log.i("MY_APP", "appended. last char: "+buffer[charsRead-1]);
             }
+            Log.i("MY_APP", "after readLine: "+sb.toString());
             reader.close();
-            Log.i("MY_APP", "sb.toString().length() = "+sb.toString().length());
-            //result = new JSONArray(sb.toString().substring(1, sb.toString().length()));
             switch (downloadDataKind) {
                 case STATIONS:
                     result = new JSONArray(sb.toString());

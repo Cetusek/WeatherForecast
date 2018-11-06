@@ -12,6 +12,7 @@ public class GIOSSensor {
     public String paramName;
     public String paramFormula;
     public String paramCode;
+    public ArrayList<GIOSSensorValue> values;
 
 
     public GIOSSensor(JSONObject json) {
@@ -24,6 +25,16 @@ public class GIOSSensor {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getValue() {
+        String result = "";
+        if (values != null) {
+            if (values.size() > 0) {
+                result = values.get(0).value;
+            }
+        }
+        return result;
     }
 
     @Override

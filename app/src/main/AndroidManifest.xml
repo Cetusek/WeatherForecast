@@ -29,7 +29,8 @@
 
         <activity android:name=".presenter.PresenterActivity" />
         <activity android:name=".favourites.FavouritesActivity" />
-        <activity android:name=".storm.StormActivity"></activity>
+        <activity android:name=".storm.StormActivity" />
+        <activity android:name=".gios.GIOSStationPresenter"></activity>
     </application>
 
 </manifest>
