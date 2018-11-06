@@ -108,7 +108,10 @@ public class PresenterActivity extends AppCompatActivity implements DBAsyncTask.
 
     private void airDataButtonPressed() {
         DownloadGIOSManager downloadGIOSManager = new DownloadGIOSManager();
-        downloadGIOSManager.downloadSensors(295);
+        downloadGIOSManager.downloadStations();
+        //downloadGIOSManager.downloadSensors(295);
+        //downloadGIOSManager.downloadSensorData(2060);
+        //downloadGIOSManager.downloadAirQualityIndex(295);
     }
 
     private void loadImage(int position) {

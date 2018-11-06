@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
+import pl.marek.weatherforecast.gios.GIOSStation;
 import pl.marek.weatherforecast.meteo.Coordinates;
 
 public class DownloadGIOSData extends AsyncTask {
@@ -21,16 +23,19 @@ public class DownloadGIOSData extends AsyncTask {
 
     private DownloadGIOSDataCallback callback;
     private String url;
+    private DownloadDataKind downloadDataKind;
 
-    public DownloadGIOSData(DownloadGIOSDataCallback callback, String url) {
+    public DownloadGIOSData(DownloadGIOSDataCallback callback, String url, DownloadDataKind downloadDataKind) {
         this.callback = callback;
         this.url = url;
+        this.downloadDataKind = downloadDataKind;
     }
 
     @Override
-    protected JSONArray doInBackground(Object[] params) {
-        JSONArray result = null;
+    protected Object doInBackground(Object[] params) {
+        Object result = null;
         try {
+            Log.i("MY_APP", url);
             URL url_ = new URL(url);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url_.openStream()));
             StringBuilder sb = new StringBuilder();
@@ -41,29 +46,51 @@ public class DownloadGIOSData extends AsyncTask {
             reader.close();
             Log.i("MY_APP", "sb.toString().length() = "+sb.toString().length());
             //result = new JSONArray(sb.toString().substring(1, sb.toString().length()));
-            result = new JSONArray(sb.toString());
+            switch (downloadDataKind) {
+                case STATIONS:
+                    result = new JSONArray(sb.toString());
+                    break;
+                case SENSORS:
+                    result = new JSONArray(sb.toString());
+                    break;
+                case SENSOR_DATA:
+                    result = new JSONObject(sb.toString());
+                    break;
+                case AIR_QUALITY_INDEX:
+                    result = new JSONObject(sb.toString());
+                    break;
+            }
         } catch (MalformedURLException e) {
-            callback.onDownloadGIOSDataFailure("DownloadGIOSData MalformedURLException "+e.getMessage());
+            failureOccured("DownloadGIOSData MalformedURLException "+e.getMessage());
         } catch (IOException e) {
-            callback.onDownloadGIOSDataFailure("DownloadGIOSData IOException "+e.getMessage());
+            failureOccured("DownloadGIOSData IOException "+e.getMessage());
         } catch (JSONException e) {
-            callback.onDownloadGIOSDataFailure("DownloadGIOSData JSONException "+e.getMessage());
+            failureOccured("DownloadGIOSData JSONException "+e.getMessage());
         }
 
         return result;
     }
 
+    private void failureOccured(String message) {
+        callback.onDownloadGIOSDataFailure(downloadDataKind, message);
+    }
+
     @Override
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
-        if (o != null) {
-            callback.onDownloadGIOSDataSuccess((JSONArray) o);
-        }
+        callback.onDownloadGIOSSuccess(downloadDataKind, o);
     }
 
     interface DownloadGIOSDataCallback {
-        public void onDownloadGIOSDataSuccess(JSONArray result);
-        public void onDownloadGIOSDataFailure(String message);
+        public void onDownloadGIOSSuccess(DownloadDataKind downloadDataKind, Object result);
+        public void onDownloadGIOSDataFailure(DownloadDataKind downloadDataKind, String message);
+    }
+
+    enum DownloadDataKind {
+        STATIONS,
+        SENSORS,
+        SENSOR_DATA,
+        AIR_QUALITY_INDEX
     }
 
 }
