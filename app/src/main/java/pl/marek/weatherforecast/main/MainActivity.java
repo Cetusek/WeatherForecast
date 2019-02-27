@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import pl.marek.weatherforecast.R;
+import pl.marek.weatherforecast.crash.CustomExceptionHandler;
 import pl.marek.weatherforecast.favourites.FavouritesActivity;
 import pl.marek.weatherforecast.map.MapActivity;
 import pl.marek.weatherforecast.permission.PermissionTools;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements DBAsyncTask.Callb
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CustomExceptionHandler.assignHandler(this);
         setContentView(R.layout.activity_main);
         mapGUI();
         checkPermissions();
