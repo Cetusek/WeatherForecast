@@ -37,20 +37,15 @@ public class DownloadGIOSData extends AsyncTask {
     protected Object doInBackground(Object[] params) {
         Object result = null;
         try {
-            Log.i("MY_APP", url);
             URL url_ = new URL(url);
             BufferedReader reader = new BufferedReader(new InputStreamReader(url_.openStream()));
             StringBuilder sb = new StringBuilder();
             String line;
-            Log.i("MY_APP", "before readLine");
             char[] buffer = new char[1024];
             int charsRead;
             while ((charsRead = reader.read(buffer)) != -1)  {
-                Log.i("MY_APP", "charsRead = "+charsRead);
                 sb.append(Arrays.copyOf(buffer, charsRead));
-                Log.i("MY_APP", "appended. last char: "+buffer[charsRead-1]);
             }
-            Log.i("MY_APP", "after readLine: "+sb.toString());
             reader.close();
             switch (downloadDataKind) {
                 case STATIONS:

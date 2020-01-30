@@ -5,7 +5,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class URLs {
 
-    private static final String URL_COORDINATES = "https://nowe.meteo.pl/search_mgram_pos?lat=$$LATITUDE$$&lon=$$LONGITUDE$$&model=0";
+    private static final String URL_COORDINATES = "http://www.meteo.pl/um/php/mgram_search.php?NALL=$$LATITUDE$$&EALL=$$LONGITUDE$$"; //"https://nowe.meteo.pl/search_mgram_pos?lat=$$LATITUDE$$&lon=$$LONGITUDE$$&model=0";
     private static final String URL_IMAGE = "https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=$$ROW$$&col=$$COL$$&lang=pl";
 
     public static String getCoordinatesURL(LatLng location) {
@@ -21,5 +21,6 @@ public class URLs {
         result = result.replace("$$COL$$", Integer.toString(coordinates.getCol()));
         return result;
     }
+
 
 }

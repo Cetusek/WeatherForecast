@@ -28,6 +28,20 @@ public class DownloadCoordinates extends AsyncTask {
         this.callback = callback;
     }
 
+    private String getStringBetweenStrings(String source, String s1, String s2) {
+        String result = null;
+        String tmp = source.toString();
+        int pos = tmp.indexOf(s1);
+        if (pos != -1) {
+            tmp = tmp.substring(pos + s1.length());
+            pos = tmp.indexOf(s2);
+            if (pos != -1) {
+                result = tmp.substring(0, pos);
+            }
+        }
+        return result;
+    }
+
     @Override
     protected Coordinates doInBackground(Object[] params) {
 
@@ -36,18 +50,23 @@ public class DownloadCoordinates extends AsyncTask {
         try {
             URL url = new URL(URLs.getCoordinatesURL(location));
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line = reader.readLine();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.indexOf("var act_x = ") != -1) {
+                    String act_x = getStringBetweenStrings(line, "act_x = ", ";");
+                    String act_y = getStringBetweenStrings(line, "act_y = ", ";");
+                    if (act_x != null && act_y != null) {
+                        result = new Coordinates();
+                        result.setRow(Integer.parseInt(act_y));
+                        result.setCol(Integer.parseInt(act_x));
+                    }
+                }
+            }
             reader.close();
-            JSONObject json = new JSONObject(line);
-            result = new Coordinates();
-            result.setRow(json.getInt("row"));
-            result.setCol(json.getInt("col"));
         } catch (MalformedURLException e) {
             callback.onCoordinatesDownloadErrorOccurred("onCoordinatesDownloadErrorOccurred MalformedURLException "+e.getMessage());
         } catch (IOException e) {
             callback.onCoordinatesDownloadErrorOccurred("onCoordinatesDownloadErrorOccurred IOException "+e.getMessage());
-        } catch (JSONException e) {
-            callback.onCoordinatesDownloadErrorOccurred("onCoordinatesDownloadErrorOccurred JSONException "+e.getMessage());
         }
 
         return result;

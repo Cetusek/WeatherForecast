@@ -1,6 +1,19 @@
 package pl.marek.weatherforecast.meteo;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Coordinates {
+
+    private final int MIN_ROW = 17;
+    private final int MAX_ROW = 598;
+    private final int MIN_COL = 17;
+    private final int MAX_COL = 430;
+    private final int STEP = 7;
+
+    private final double MIN_LATITUDE = 44.7666666666666667;
+    private final double MAX_LATITUDE = 66.3166666666666667;
+    private final double MIN_LONGITUDE = 4.1166666666666667;
+    private final double MAX_LONGITUDE = 34.6166666666666667;
 
     private int row;
     private int col;
@@ -44,6 +57,12 @@ public class Coordinates {
         return getRow()+" "+getCol();
     }
 
+    public void set(LatLng location) {
+        double lat_row = (MAX_LATITUDE - location.latitude) / (MAX_LATITUDE - MIN_LATITUDE);
+        row = (int) Math.round(lat_row * (MAX_ROW - MIN_ROW) / STEP) * STEP + MIN_ROW;
+        double lon_col = (location.longitude - MIN_LONGITUDE) / (MAX_LONGITUDE - MIN_LONGITUDE);
+        col = (int) Math.round(lon_col * (MAX_COL - MIN_COL) / STEP) * STEP + MIN_COL;
+    }
 
 
 }
